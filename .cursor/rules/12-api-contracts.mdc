@@ -1,0 +1,31 @@
+---
+description: API contract and schema standards — schema-first approach, OpenAPI 3.1, Mongoose as source of truth
+globs: **/*.schema.*,**/models/**,**/openapi*,**/*.contract.*,**/schemas/**
+alwaysApply: false
+---
+
+# API Contracts & Schemas
+
+## Schema-First Rule
+
+The API contract is defined and approved by the user **before** any implementation begins.
+No backend route and no frontend API call is written until the contract is signed off.
+
+## OpenAPI 3.1
+
+- All endpoints documented: path, method, request body, response, error cases
+- Every field includes `description` and `example`
+- Error responses documented for each endpoint (at minimum 400 and 500)
+- Contract file location: `openapi.yaml` or `docs/api/openapi.yaml`
+
+## Mongoose Schema = Source of Truth
+
+- TypeScript types are always derived from Mongoose schemas via `InferSchemaType`
+- No duplicate type definitions between schema files and TypeScript interfaces
+- Schema validation rules (min, max, required, enum) reflect business rules exactly
+
+## Financial Data Precision
+
+- Monetary values stored as integers (cents/kopecks) in MongoDB when precision is critical
+- Or use `Decimal128` for high-precision financial fields
+- Document the chosen precision strategy in the schema with a comment

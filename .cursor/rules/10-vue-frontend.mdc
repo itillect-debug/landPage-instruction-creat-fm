@@ -1,0 +1,118 @@
+---
+description: Vue 3 frontend standards — components, Pinia, composables, financial UI, responsiveness
+globs: **/*.vue,src/**/*.ts,frontend/**/*.ts
+alwaysApply: false
+---
+
+# Vue 3 / Frontend Standards
+
+## Component Structure
+
+Always in this order, include only what is needed:
+```vue
+<script setup lang="ts">
+<template>
+<style scoped>
+```
+
+- `<script setup lang="ts">` — required on every component. No Options API.
+- Single responsibility: components handle **rendering only**. Logic and state go into composables.
+- Composables handle **logic and state only**. No rendering or DOM concerns inside them.
+- Utilities are **pure, stateless functions**. No Vue reactivity inside utility files.
+
+## Props, Emits, Model
+
+```ts
+// Props — always typed, destructure for defaults (not withDefaults)
+const { label = 'Default', count = 0 } = defineProps<{
+  label?: string
+  count?: number
+}>()
+
+// Emits — typed tuple format
+const emit = defineEmits<{
+  submit: [value: string]
+  cancel: []
+}>()
+
+// v-model — use defineModel() (Vue 3.4+), not modelValue prop manually
+const model = defineModel<string>()
+```
+
+- camelCase in `<script setup>`, kebab-case in templates
+- `const props =` only when props are used inside `<script setup>` block
+
+## Template Refs and Watchers
+
+```ts
+// Template refs — useTemplateRef() (Vue 3.5+), not $refs
+const inputRef = useTemplateRef('inputRef')
+
+// Watching props — always use a getter function
+watch(() => props.count, (newVal) => { ... })
+// ❌ watch(props.count, ...) — loses reactivity
+```
+
+## State Management (Pinia)
+
+Use setup stores (`defineStore('name', () => {...})`):
+
+```ts
+export const useFeatureStore = defineStore('feature', () => {
+  const items = ref<Item[]>([])
+  const total = computed(() => items.value.length)
+
+  async function loadItems() { ... }
+
+  return { items, total, loadItems }
+  // Return ALL state so Pinia devtools can track it
+})
+```
+
+- **Pinia**: shared state that spans routes or unrelated component trees
+- **`ref` / `computed`**: local component state
+- **Server state** (API responses not needing local edits): fetch directly, don't copy into Pinia
+- `storeToRefs()` when destructuring store state or getters — direct destructure breaks reactivity:
+
+```ts
+const store = useFeatureStore()
+const { items, total } = storeToRefs(store) // ✅
+const { loadItems } = store                  // actions destructure directly
+```
+
+## Composables
+
+- Name: `useCamelCase.ts`, starts with `use`
+- Extract when logic is used in 2+ components
+- Prefer `MaybeRefOrGetter` + `toValue()` when accepting reactive arguments
+- Prefer object arguments over multiple positional args
+
+## Financial Values
+
+- All monetary values arrive from API as **integers (kopecks)**
+- Display: always use the shared `useFormatCurrency` composable — never inline the conversion
+- Profit / positive delta → `text-green-*` token; Loss / negative → `text-red-*` token
+- Never hardcoded hex for financial indicators
+
+## Layout & Responsiveness
+
+- **Desktop-first**: design for `1280px+`, adapt down with `md:` and default classes
+- Breakpoints: `1280px` / `1024px` / `768px`
+- Semantic HTML: `<main>`, `<section>`, `<article>`, `<label>`
+- ARIA labels on all interactive elements without visible text
+
+## Naming Conventions
+
+| Type | Convention | Location |
+|------|-----------|----------|
+| Components | `PascalCase.vue` | `features/[name]/components/` or `components/ui/` |
+| Composables | `useCamelCase.ts` | `composables/` or colocated |
+| Stores | `useCamelCaseStore.ts` | `features/[name]/store/` or `stores/` |
+| Types | `PascalCase` | `src/types/` or `feature/types.ts` |
+
+## Pinia Anti-Patterns
+
+- Do not destructure store state without `storeToRefs()`
+- Do not put server-only objects, DOM nodes, or timers in store state
+- Do not use Pinia as a dumping ground for every reactive value
+- Do not create circular reads between stores in setup functions

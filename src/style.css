@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /*
+   * Light-fintech palette (HSL channels for shadcn-style tokens).
+   * Source of truth lives in docs/design-system.md → "Light Fintech Theme".
+   */
+  :root {
+    /* Palette mirrors itillect.ru ФМ-ПРО: azure-blue accent, slate text. */
+    --background: 0 0% 96%; /* #f5f5f5 section gray */
+    --surface: 210 33% 98%; /* near-white inset */
+    --foreground: 209 22% 27%; /* #364655 dark slate */
+
+    --card: 0 0% 100%;
+    --card-foreground: 209 22% 27%;
+
+    --primary: 211 100% 52%; /* #0a81ff azure blue */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 214 100% 95%; /* #e6f0ff light blue highlight */
+    --secondary-foreground: 212 84% 42%; /* deep blue on light */
+
+    --muted: 0 0% 94%; /* #efefef */
+    --muted-foreground: 214 16% 58%; /* #8392a5 slate */
+
+    --accent: 213 100% 94%; /* #e0edff hover blue */
+    --accent-foreground: 212 84% 40%;
+
+    --positive: 146 84% 39%; /* #10b759 green for prices/gains */
+    --positive-foreground: 0 0% 100%;
+
+    --danger: 354 72% 54%; /* #de3444 sale/accent red */
+
+    --border: 220 13% 91%; /* #e7e9ee soft neutral */
+    --input: 0 0% 88%; /* #e1e1e1 */
+    --ring: 211 100% 52%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Soft dotted/grid background used in hero + section separators */
+  .bg-grid {
+    background-image: radial-gradient(
+      hsl(var(--primary) / 0.08) 1px,
+      transparent 1px
+    );
+    background-size: 26px 26px;
+  }
+
+  .bg-radial-fade {
+    background: radial-gradient(
+      80% 60% at 50% 0%,
+      hsl(var(--primary) / 0.08),
+      transparent 70%
+    );
+  }
+
+  /* Scroll-reveal initial state — GSAP clears these on reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    will-change: opacity, transform;
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      120deg,
+      hsl(211 100% 52%),
+      hsl(216 97% 49%)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}

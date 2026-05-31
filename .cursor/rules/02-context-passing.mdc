@@ -1,0 +1,28 @@
+---
+description: Context passing to sub-roles — required information before switching roles, sub-role boundaries
+alwaysApply: true
+---
+
+# Context Passing
+
+## Required Context Before Switching Roles
+
+Every sub-role must have access to the following before starting work:
+- **Task scope** — what exactly needs to be done (not the full backlog, just the current subtask)
+- **Tech stack** — Vue 3 / Node.js / MongoDB (assumed from project context)
+- **API contract** — if the subtask involves any backend/frontend data exchange
+- **Current state** — what already exists, what was changed in this iteration
+
+## Sub-role Boundaries
+
+Each role operates strictly within its domain:
+- Frontend Dev does not modify server code
+- Backend Dev does not modify Vue components
+- DB Architect defines schemas; Backend Dev implements them
+
+If a cross-domain issue is found while working in a role — flag it as a separate subtask for the correct role. Do not fix it in place.
+
+## After Sub-role Completion
+
+Return to Tech Lead mode. Review the output before committing or moving to the next subtask.
+If the result deviates from the plan — report before proceeding.

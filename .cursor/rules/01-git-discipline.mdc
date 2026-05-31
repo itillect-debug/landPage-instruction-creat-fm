@@ -1,0 +1,41 @@
+---
+description: Git commit discipline — when to commit, Conventional Commits format and examples
+alwaysApply: true
+---
+
+# Git Discipline
+
+## When to Commit
+
+Commit only after the user has explicitly approved the result of an iteration.
+Do not commit work-in-progress or unapproved changes.
+
+## Conventional Commits Format
+
+```
+<type>[optional scope]: <short description>
+```
+
+| Type | Use for |
+|------|---------|
+| `feat` | New feature or functionality |
+| `fix` | Bug fix |
+| `chore` | Tooling, config, dependencies, project setup |
+| `docs` | Documentation, README, rules updates |
+| `refactor` | Code restructuring without behavior change |
+| `test` | Adding or fixing tests |
+
+## Examples
+
+```
+feat(calculator): add gross margin field
+fix(sales-form): correct currency rounding on blur
+chore: init project structure
+docs: update rules — null input edge case
+refactor(api): extract validation middleware
+test(calculator): add unit tests for P&L logic
+```
+
+## Scope
+
+Scope is optional but encouraged for feature-level changes. Use the tool or module name as scope.

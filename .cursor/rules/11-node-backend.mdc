@@ -1,0 +1,38 @@
+---
+description: Node.js backend standards — REST API design, MongoDB, error handling, security
+globs: server/**,routes/**,controllers/**,api/**,backend/**,src/server/**
+alwaysApply: false
+---
+
+# Node.js / Backend Standards
+
+## API Design
+
+- REST only; versioned at `/api/v1/`
+- Consistent response envelope:
+  ```json
+  { "data": ..., "error": null, "meta": {} }
+  { "data": null, "error": { "code": "...", "message": "..." } }
+  ```
+- Use correct HTTP status codes: 200 / 201 / 400 / 401 / 403 / 404 / 422 / 500
+
+## MongoDB / Mongoose
+
+- Define explicit Mongoose schemas with full validation — no bare objects
+- Derive TypeScript types from schemas using `InferSchemaType` — no duplicate interfaces
+- Use aggregation pipelines for financial calculations (sums, averages, grouping)
+- Index all fields used in query filters and sort operations
+
+## Error Handling
+
+- All async route handlers must catch errors — no unhandled promise rejections
+- Structured error logging: include request method, path, user context when available
+- Never expose stack traces or internal errors to the client in production
+- Centralized error handler middleware at the end of the Express/Fastify chain
+
+## Security
+
+- All secrets and config via `.env` — never hardcoded
+- Validate and sanitize all incoming request data before use
+- `.env` file is always in `.gitignore`
+- Use `helmet` (Express) or equivalent for HTTP security headers

@@ -1,0 +1,31 @@
+---
+description: Core workflow rules — approval gates, task discipline, and edge case handling
+alwaysApply: true
+---
+
+# Global Workflow
+
+## Approval Gate
+
+Never make changes to code, files, or configuration without explicit user approval.
+If you see issues or improvements outside the current task scope — flag them as a note, do not fix them.
+
+## Task Discipline
+
+Execute exactly what was asked. If you have corrections, suggestions, or notice something worth discussing:
+1. State your observation clearly
+2. Ask for permission or direction
+3. Only then proceed
+
+## Edge Case Handling
+
+When an edge case appears during work:
+1. Pause and state: "Edge case: [description]"
+2. Propose a concrete solution
+3. Wait for approval
+4. Update the relevant `.cursor/rules/*.mdc` file
+5. Commit: `docs: update rules — [topic]`
+
+## Living Rules
+
+Rules are not static. When new patterns or constraints are discovered and approved, they are added to the appropriate rule file immediately and committed with a `docs:` prefix.
