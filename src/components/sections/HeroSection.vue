@@ -125,7 +125,7 @@ onMounted(() => {
               9 этапов
             </span>
             <span class="h-4 w-px bg-border" />
-            <span>3 отчёта + 7 KPI</span>
+            <span>10 отчётов + 17 KPI</span>
             <span class="h-4 w-px bg-border" />
             <span>+39 аналитик</span>
           </div>

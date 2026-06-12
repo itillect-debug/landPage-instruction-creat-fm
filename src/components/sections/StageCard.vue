@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import {
   ArrowRight,
   Play,
@@ -18,6 +19,8 @@ import {
   HandCoins,
   ArrowUpRight,
   Lightbulb,
+  ChevronDown,
+  X,
 } from 'lucide-vue-next'
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
@@ -26,7 +29,32 @@ import type { Stage } from '@/data/landing'
 
 defineProps<{ stage: Stage }>()
 
-const industries = ['Производство', 'Ритейл', 'HoReCa', 'IT / SaaS', 'Логистика', 'Агро']
+const isExpanded = ref(false)
+const isVideoModalOpen = ref(false)
+
+const toggleExpanded = () => {
+  isExpanded.value = !isExpanded.value
+}
+
+const openVideoModal = () => {
+  isVideoModalOpen.value = true
+}
+
+const closeVideoModal = () => {
+  isVideoModalOpen.value = false
+}
+
+const industries = [
+  'Производство',
+  'Ритейл',
+  'HoReCa',
+  'IT / SaaS',
+  'Логистика',
+  'Агро',
+  'Недвижимость',
+  'Фарм/Био',
+  'Прочее',
+]
 const investmentIcons: Record<string, any> = {
   Оборудование: Factory,
   ERP: Cpu,
@@ -221,8 +249,35 @@ const nonProdIcons: Record<string, any> = {
     </div>
 
     <!-- media placeholders -->
-    <div class="mt-6 grid gap-3 sm:grid-cols-2">
+    <div v-if="stage.id !== 1" class="mt-6 grid gap-3 sm:grid-cols-2">
+      <button
+        v-if="stage.videoEmbedUrl"
+        @click="openVideoModal"
+        type="button"
+        class="group/media relative aspect-video overflow-hidden rounded-xl border border-border bg-surface/70 transition-colors hover:border-primary/40 cursor-pointer"
+        aria-label="Воспроизвести видео-инструкцию"
+      >
+        <img
+          v-if="stage.videoThumbnail"
+          :src="stage.videoThumbnail"
+          alt=""
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+        <span
+          class="absolute inset-0 bg-black/35 transition-colors group-hover/media:bg-black/45"
+          aria-hidden="true"
+        />
+        <span class="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1.5 text-white">
+          <span
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/90 text-white shadow-md transition-transform group-hover/media:scale-110"
+          >
+            <Play class="h-4 w-4 translate-x-px" />
+          </span>
+          <span class="text-xs font-medium">Видео-инструкция</span>
+        </span>
+      </button>
       <div
+        v-else
         class="group/media flex aspect-video items-center justify-center rounded-xl border border-dashed border-border bg-surface/70 transition-colors hover:border-primary/40 hover:bg-accent"
       >
         <span class="flex flex-col items-center gap-1.5 text-muted-foreground">
@@ -244,12 +299,77 @@ const nonProdIcons: Record<string, any> = {
       </div>
     </div>
 
-    <!-- CTA -->
-    <div class="mt-6">
-      <Button variant="ghost" size="sm" as="a" href="#contact" class="px-0 hover:bg-transparent hover:text-primary">
-        Подробнее об этапе
-        <ArrowRight class="h-4 w-4" />
-      </Button>
+    <!-- Expandable detailed content -->
+    <div v-if="stage.detailedContent" class="mt-6">
+      <button
+        @click="toggleExpanded"
+        class="flex w-full items-center justify-between rounded-lg border border-border bg-surface px-4 py-3 text-left transition-all hover:border-primary/30 hover:bg-accent"
+      >
+        <span class="text-sm font-medium text-foreground">Подробнее об этапе</span>
+        <ChevronDown
+          class="h-4 w-4 text-muted-foreground transition-transform duration-200"
+          :class="{ 'rotate-180': isExpanded }"
+        />
+      </button>
+
+      <div
+        v-if="isExpanded"
+        class="mt-3 rounded-lg border border-border bg-surface/50 px-4 py-4 text-sm leading-relaxed text-foreground/90"
+      >
+        {{ stage.detailedContent }}
+      </div>
     </div>
+
+    <!-- Video Modal -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div
+          v-if="isVideoModalOpen && stage.videoEmbedUrl"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          @click.self="closeVideoModal"
+        >
+          <div class="relative w-full max-w-7xl">
+            <button
+              @click="closeVideoModal"
+              class="absolute -top-12 right-0 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              aria-label="Закрыть видео"
+            >
+              <X class="h-5 w-5" />
+            </button>
+            <div class="relative aspect-video w-full overflow-hidden rounded-xl bg-black shadow-2xl">
+              <iframe
+                v-if="isVideoModalOpen"
+                :src="stage.videoEmbedUrl"
+                class="h-full w-full"
+                style="border: none;"
+                allow="clipboard-write; autoplay; fullscreen"
+                allowfullscreen
+                :title="`Видео-инструкция: ${stage.title}`"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </article>
 </template>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+.modal-enter-active .relative {
+  transition: transform 0.3s ease;
+}
+
+.modal-enter-from .relative {
+  transform: scale(0.95);
+}
+</style>
