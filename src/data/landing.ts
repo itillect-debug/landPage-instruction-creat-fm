@@ -9,6 +9,7 @@ export interface Stage {
   videoUrl?: string
   videoEmbedUrl?: string
   videoThumbnail?: string
+  screenshots?: string[]
   /** custom visual block key handled inside StageCard */
   visual:
     | 'industry'
@@ -57,6 +58,11 @@ export const stages: Stage[] = [
     videoEmbedUrl:
       'https://rutube.ru/play/embed/ffd0b522d44ca6c1253d589c9b030458/?skinColor=00cbff&autoplay=1',
     videoThumbnail: '/images/stage-03-video-preview.jpg',
+    screenshots: [
+      '/images/stage-03-screen-01.png',
+      '/images/stage-03-screen-02.png',
+      '/images/stage-03-screen-03.png',
+    ],
     visual: 'investments',
   },
   {
@@ -69,6 +75,10 @@ export const stages: Stage[] = [
     videoEmbedUrl:
       'https://rutube.ru/play/embed/52afc4788e4e2b374c40f75b3915161e/?skinColor=00cbff&stopTime=196&autoplay=1',
     videoThumbnail: '/images/stage-04-video-preview.jpg',
+    screenshots: [
+      '/images/stage-04-screen-01.png',
+      '/images/stage-04-screen-02.png',
+    ],
     visual: 'production',
   },
   {
@@ -81,7 +91,11 @@ export const stages: Stage[] = [
     videoUrl: 'https://rutube.ru/video/52afc4788e4e2b374c40f75b3915161e/',
     videoEmbedUrl:
       'https://rutube.ru/play/embed/52afc4788e4e2b374c40f75b3915161e/?skinColor=00cbff&t=196&autoplay=1',
-    videoThumbnail: '/images/stage-05-video-preview.jpg',
+    videoThumbnail: '/images/stage-04-video-preview.jpg',
+    screenshots: [
+      '/images/stage-05-screen-01.png',
+      '/images/stage-05-screen-02.png',
+    ],
     visual: 'non-production',
   },
   {
@@ -95,6 +109,10 @@ export const stages: Stage[] = [
     videoEmbedUrl:
       'https://rutube.ru/play/embed/e5b410dd295cde920456fcb480f65028/?skinColor=00cbff&autoplay=1',
     videoThumbnail: '/images/stage-06-video-preview.jpg',
+    screenshots: [
+      '/images/stage-06-screen-01.png',
+      '/images/stage-06-screen-02.png',
+    ],
     visual: 'sales',
   },
   {
@@ -107,6 +125,10 @@ export const stages: Stage[] = [
     videoEmbedUrl:
       'https://rutube.ru/play/embed/a7bd2d53bb12786928716921db447116/?skinColor=00cbff&autoplay=1',
     videoThumbnail: '/images/stage-07-video-preview.jpg',
+    screenshots: [
+      '/images/stage-07-screen-01.png',
+      '/images/stage-07-screen-02.png',
+    ],
     visual: 'staff',
   },
   {
@@ -119,6 +141,10 @@ export const stages: Stage[] = [
     videoEmbedUrl:
       'https://rutube.ru/play/embed/d80c9fc0d78352cc132f8d8a932b6bbd/?skinColor=00cbff&autoplay=1',
     videoThumbnail: '/images/stage-08-video-preview.jpg',
+    screenshots: [
+      '/images/stage-08-screen-01.png',
+      '/images/stage-08-screen-02.png',
+    ],
     visual: 'financing',
   },
   {
@@ -128,6 +154,21 @@ export const stages: Stage[] = [
     description:
       'Автоматический расчёт отчётов и инвестиционных показателей по всем введённым данным.',
     detailedContent: 'На финальном этапе модель автоматически формирует три основных отчёта: Cash Flow (движение денежных средств), Profit & Loss (прибыли и убытки), Balance Sheet (баланс). На их основе рассчитываются инвестиционные показатели: IRR (внутренняя норма доходности — целевая планка >15%), NPV (чистая приведённая стоимость — должна быть положительной), PI (индекс прибыльности >1), PP и DPP (простая и дисконтированная окупаемость), WACC (средневзвешенную стоимость капитала), ARR (учётная норма прибыли). Проанализируйте результаты, проведите сценарный анализ (реалистичный/оптимистичный/пессимистичный), проверьте чувствительность к ключевым параметрам. Финансовая модель рассчитывает 39 дополнительных аналитик, строит графики, формирует выгружаемые отчёты в формализованном виде, которые помогут вам проанализировать результаты и принять решение о целесообразности инвестирования.',
+    screenshots: [
+      '/images/stage-09-screen-01.png',
+      '/images/stage-09-screen-02.png',
+      '/images/stage-09-screen-03.png',
+      '/images/stage-09-screen-04.png',
+      '/images/stage-09-screen-05.png',
+      '/images/stage-09-screen-06.png',
+      '/images/stage-09-screen-07.png',
+      '/images/stage-09-screen-08.png',
+      '/images/stage-09-screen-09.png',
+      '/images/stage-09-screen-10.png',
+      '/images/stage-09-screen-11.png',
+      '/images/stage-09-screen-12.png',
+      '/images/stage-09-screen-13.png',
+    ],
     visual: 'results',
   },
 ]

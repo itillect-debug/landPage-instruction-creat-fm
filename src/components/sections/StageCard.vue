@@ -20,7 +20,12 @@ import {
   ArrowUpRight,
   Lightbulb,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   X,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
 } from 'lucide-vue-next'
 import Button from '@/components/ui/Button.vue'
 import Badge from '@/components/ui/Badge.vue'
@@ -31,6 +36,62 @@ defineProps<{ stage: Stage }>()
 
 const isExpanded = ref(false)
 const isVideoModalOpen = ref(false)
+
+// carousel / lightbox
+const isLightboxOpen = ref(false)
+const lightboxIndex = ref(0)
+
+// zoom state
+const zoomLevel = ref(1)
+const ZOOM_STEP = 0.4
+const ZOOM_MIN = 1
+const ZOOM_MAX = 4
+
+const resetZoom = () => { zoomLevel.value = 1 }
+
+const zoomIn = () => { zoomLevel.value = Math.min(zoomLevel.value + ZOOM_STEP, ZOOM_MAX) }
+const zoomOut = () => { zoomLevel.value = Math.max(zoomLevel.value - ZOOM_STEP, ZOOM_MIN) }
+
+const handleWheelZoom = (e: WheelEvent) => {
+  e.preventDefault()
+  if (e.deltaY < 0) zoomIn()
+  else zoomOut()
+}
+
+const handleDblClick = () => {
+  if (zoomLevel.value > 1) resetZoom()
+  else zoomLevel.value = 2
+}
+
+const openLightbox = (index: number) => {
+  lightboxIndex.value = index
+  resetZoom()
+  isLightboxOpen.value = true
+}
+
+const closeLightbox = () => {
+  isLightboxOpen.value = false
+  resetZoom()
+}
+
+const lightboxPrev = (screenshots: string[]) => {
+  lightboxIndex.value = (lightboxIndex.value - 1 + screenshots.length) % screenshots.length
+  resetZoom()
+}
+
+const lightboxNext = (screenshots: string[]) => {
+  lightboxIndex.value = (lightboxIndex.value + 1) % screenshots.length
+  resetZoom()
+}
+
+const handleLightboxKey = (e: KeyboardEvent, screenshots: string[]) => {
+  if (e.key === 'ArrowLeft') lightboxPrev(screenshots)
+  if (e.key === 'ArrowRight') lightboxNext(screenshots)
+  if (e.key === 'Escape') closeLightbox()
+  if (e.key === '+' || e.key === '=') zoomIn()
+  if (e.key === '-') zoomOut()
+  if (e.key === '0') resetZoom()
+}
 
 const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value
@@ -289,7 +350,32 @@ const nonProdIcons: Record<string, any> = {
           <span class="text-xs">Видео-инструкция</span>
         </span>
       </div>
+      <!-- screenshots carousel thumbnail or placeholder -->
+      <div v-if="stage.screenshots && stage.screenshots.length">
+        <!-- first screenshot as preview, click opens lightbox -->
+        <button
+          @click="openLightbox(0)"
+          type="button"
+          class="group/screen relative aspect-video w-full overflow-hidden rounded-xl border border-border bg-surface/70 transition-colors hover:border-primary/40 cursor-pointer"
+          aria-label="Открыть скриншоты интерфейса"
+        >
+          <img
+            :src="stage.screenshots[0]"
+            alt="Скриншот интерфейса"
+            class="absolute inset-0 h-full w-full object-cover"
+          />
+          <span class="absolute inset-0 bg-black/30 transition-colors group-hover/screen:bg-black/45" aria-hidden="true" />
+          <span class="relative z-10 flex h-full w-full flex-col items-center justify-center gap-1.5 text-white">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/90 shadow-md transition-transform group-hover/screen:scale-110">
+              <ZoomIn class="h-4 w-4" />
+            </span>
+            <span class="text-xs font-medium">Скриншот интерфейса</span>
+            <span class="rounded-full bg-black/40 px-2 py-0.5 text-[10px]">{{ stage.screenshots.length }} фото</span>
+          </span>
+        </button>
+      </div>
       <div
+        v-else
         class="flex aspect-video items-center justify-center rounded-xl border border-dashed border-border bg-surface/70 transition-colors hover:border-primary/40 hover:bg-accent"
       >
         <span class="flex flex-col items-center gap-1.5 text-muted-foreground">
@@ -319,6 +405,122 @@ const nonProdIcons: Record<string, any> = {
         {{ stage.detailedContent }}
       </div>
     </div>
+
+    <!-- Lightbox / Screenshots carousel -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div
+          v-if="isLightboxOpen && stage.screenshots?.length"
+          class="fixed inset-0 z-50 flex flex-col bg-black/95"
+          tabindex="-1"
+          @keydown="handleLightboxKey($event, stage.screenshots!)"
+        >
+          <!-- top bar -->
+          <div class="flex shrink-0 items-center justify-between px-4 py-3">
+            <p class="text-sm text-white/60">
+              {{ lightboxIndex + 1 }} / {{ stage.screenshots.length }}
+            </p>
+
+            <!-- zoom controls -->
+            <div class="flex items-center gap-1">
+              <button
+                @click="zoomOut"
+                :disabled="zoomLevel <= 1"
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white transition-colors hover:bg-white/25 disabled:opacity-30"
+                aria-label="Уменьшить"
+              >
+                <ZoomOut class="h-4 w-4" />
+              </button>
+              <button
+                @click="resetZoom"
+                class="min-w-[3rem] rounded-lg bg-white/10 px-2 py-1 text-xs text-white transition-colors hover:bg-white/25"
+                aria-label="Сбросить масштаб"
+              >
+                {{ Math.round(zoomLevel * 100) }}%
+              </button>
+              <button
+                @click="zoomIn"
+                :disabled="zoomLevel >= 4"
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white transition-colors hover:bg-white/25 disabled:opacity-30"
+                aria-label="Увеличить"
+              >
+                <ZoomIn class="h-4 w-4" />
+              </button>
+              <button
+                @click="zoomLevel = 4"
+                class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white transition-colors hover:bg-white/25 ml-1"
+                aria-label="На весь экран"
+              >
+                <Maximize2 class="h-4 w-4" />
+              </button>
+            </div>
+
+            <button
+              @click="closeLightbox"
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white transition-colors hover:bg-white/25"
+              aria-label="Закрыть"
+            >
+              <X class="h-5 w-5" />
+            </button>
+          </div>
+
+          <!-- image area -->
+          <div
+            class="relative flex flex-1 overflow-auto"
+            @wheel.prevent="handleWheelZoom"
+          >
+            <!-- left click zone — prev -->
+            <button
+              v-if="stage.screenshots.length > 1"
+              @click="lightboxPrev(stage.screenshots!)"
+              class="absolute left-0 top-0 z-10 h-full w-1/4 flex items-center justify-start pl-3 text-white opacity-0 hover:opacity-100 transition-opacity cursor-w-resize"
+              aria-label="Предыдущее"
+            >
+              <span class="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
+                <ChevronLeft class="h-6 w-6" />
+              </span>
+            </button>
+
+            <!-- image -->
+            <div class="flex flex-1 items-center justify-center p-4">
+              <img
+                :src="stage.screenshots[lightboxIndex]"
+                :alt="`Скриншот ${lightboxIndex + 1}`"
+                :style="{ transform: `scale(${zoomLevel})`, transformOrigin: 'center center', transition: 'transform 0.2s ease', cursor: zoomLevel > 1 ? 'zoom-out' : 'zoom-in' }"
+                class="max-h-[calc(100vh-11rem)] w-auto max-w-full rounded-lg shadow-2xl select-none"
+                draggable="false"
+                @dblclick="handleDblClick"
+              />
+            </div>
+
+            <!-- right click zone — next -->
+            <button
+              v-if="stage.screenshots.length > 1"
+              @click="lightboxNext(stage.screenshots!)"
+              class="absolute right-0 top-0 z-10 h-full w-1/4 flex items-center justify-end pr-3 text-white opacity-0 hover:opacity-100 transition-opacity cursor-e-resize"
+              aria-label="Следующее"
+            >
+              <span class="flex h-10 w-10 items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
+                <ChevronRight class="h-6 w-6" />
+              </span>
+            </button>
+          </div>
+
+          <!-- thumbnails strip -->
+          <div class="shrink-0 flex gap-2 overflow-x-auto px-4 pb-4 pt-2">
+            <button
+              v-for="(src, i) in stage.screenshots"
+              :key="i"
+              @click="lightboxIndex = i; resetZoom()"
+              class="h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all"
+              :class="i === lightboxIndex ? 'border-primary' : 'border-white/20 hover:border-white/50'"
+            >
+              <img :src="src" :alt="`Миниатюра ${i + 1}`" class="h-full w-full object-cover" />
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
 
     <!-- Video Modal -->
     <Teleport to="body">
